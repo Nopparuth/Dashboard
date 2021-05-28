@@ -50,21 +50,7 @@ const Timer = () => {
     start();
   };
 
-  // const h = () => {
-  //   if (time.h === 0) {
-  //     return " ";
-  //   } else {
-  //     return <span>{time.h >= 0 ? time.h : "0" + time.h}</span>;
-  //   }
-  // };
-
-  // const m = () => {
-  //   if (time.m === 0) {
-  //     return " ";
-  //   } else {
-  //     return <span>{time.m >= 0 ? time.m : "0" + time.m}</span>;
-  //   }
-  // };
+  
 
   return (
     <div>
@@ -75,8 +61,6 @@ const Timer = () => {
             <div className="text-center">
               <div className="flex items-center justify-center mt-4 mb-6">
                 <div className="text-6xl mx-7">
-                  {/* {h()}
-                  {m()} */}
                   <span>{time.m >= 10 ? time.m : "0" + time.m}</span>:
                   <span>{time.s >= 10 ? time.s : "0" + time.s}</span>
                 </div>
