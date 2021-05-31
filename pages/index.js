@@ -9,12 +9,23 @@ export default function Home() {
       <title>Widget - Daytech Dashboard</title>
       <h2 className="text-xl undifined">Widgets</h2>
       <div className="pt-3">
-        <div className="md:flex md:flex-wrap md:mr-4">
+        <div class="md:flex md:flex-wrap md:-mr-4">
+          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
           <JustSay />
-          <Counter />
-          <Timer />
+          </div>
+          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
+          <Counter/>
+          </div>
+          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
+          <Timer/>
+          </div>
         </div>
+
+        {/* <div className="md:flex md:flex-wrap md:mr-4"> */}
+        {/* <Counter />
+          <Timer /> */}
       </div>
     </div>
+    // </div>
   );
 }

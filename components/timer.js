@@ -21,7 +21,7 @@ const Timer = () => {
     if (updatedM === 59) {
       updatedH++;
       updatedM = 0;
-      alert("")
+      alert("");
     }
     if (updatedS === 59) {
       updatedM++;
@@ -32,7 +32,7 @@ const Timer = () => {
       updatedMs = 0;
     }
     updatedMs++;
-     setTime({ ms: updatedMs, s: updatedS, m: updatedM, h: updatedH });
+    setTime({ ms: updatedMs, s: updatedS, m: updatedM, h: updatedH });
   };
 
   const stop = () => {
@@ -68,8 +68,7 @@ const Timer = () => {
 
   return (
     <div>
-      <Card>
-        {status === 0 ? (
+<Card>{status === 0 ? (
           <>
             <h2 className="text-lg font-bold text-gray-400 mb-1.5">Timer</h2>
             <div className="text-center">
@@ -161,7 +160,7 @@ const Timer = () => {
         ) : (
           " "
         )}
-      </Card>
+      </Card>        
     </div>
   );
 };

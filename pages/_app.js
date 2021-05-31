@@ -11,12 +11,15 @@ class MyApp extends App {
     const Layout = Component.Layout || DefaultLayout;
 
     return (
-      <MainLayout>
+      <div>
+        <MainLayout>
         <Layout>
         <Component {...pageProps} />
 
         </Layout>
       </MainLayout>
+      </div>
+      
     );
   }
 }
