@@ -2,6 +2,7 @@ import Link from "next";
 import JustSay from "../components/justsay";
 import Counter from "../components/counter";
 import Timer from "../components/timer";
+import Widget from '../components/layouts/wideget'
 
 export default function Home() {
   return (
@@ -9,17 +10,13 @@ export default function Home() {
       <title>Widget - Daytech Dashboard</title>
       <h2 className="text-xl undifined">Widgets</h2>
       <div className="pt-3">
-        <div class="md:flex md:flex-wrap md:-mr-4">
-          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
-            <JustSay />
-          </div>
-          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
-            <Counter />
-          </div>
-          <div class="md:inner md:w-1/2 pb-4 md:pr-4">
-            <Timer />
-          </div>
-        </div>
+       <Widget/>
+        <div className="pt-3">
+</div>
+        {/* <JustSay />
+        <Counter />
+        <Timer /> */}
+      
       </div>
     </div>
   );
