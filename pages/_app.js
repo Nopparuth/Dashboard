@@ -1,9 +1,9 @@
 // pages/_app.js
-import React from 'react';
-import App from 'next/app';
-import MainLayout from '../components/layouts/main';
-import DefaultLayout from '../components/layouts/default';
-import '../style.css';
+import React from "react";
+import App from "next/app";
+import MainLayout from "../components/layouts/main";
+import DefaultLayout from "../components/layouts/default";
+import "../style.css";
 
 class MyApp extends App {
   render() {
@@ -13,13 +13,11 @@ class MyApp extends App {
     return (
       <div>
         <MainLayout>
-        <Layout>
-        <Component {...pageProps} />
-
-        </Layout>
-      </MainLayout>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </MainLayout>
       </div>
-      
     );
   }
 }

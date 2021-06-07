@@ -1,25 +1,35 @@
 import React, { useState } from "react";
+import { IoClose } from "react-icons/io5";
 import Card from "./Card";
 
-const Counter = () => {
-  const [number, setNumber] = useState(0);
-
+const Counter = ({ araigordai, onClear = () => {} }) => {
+  const [number, setNumber] = useState(parseInt(araigordai));
   const onIncrease = () => {
     setNumber(number + 1);
+    console.log(number);
   };
 
   const onDecrease = () => {
+    console.log("minus");
     setNumber(number - 1);
   };
 
-  const onReset = () => {
+  const onReset = (txtCounter) => {
     setNumber(0);
   };
 
   return (
-    <div>
+    <>
       <Card>
         <h2 className="text-lg font-bold text-gray-400 mb-1.5">Counter</h2>
+        <div className="absolute top-5 right-5">
+          <button
+            onClick={onClear}
+            className="text-lg text-gray-600 focus:outline-none undefined"
+          >
+            <IoClose />
+          </button>
+        </div>
         {number > 0 ? (
           <div className="text-center" onSubmit={(e) => e.preventDefault()}>
             <div className="flex items-center justify-center mt-4 mb-6">
@@ -73,7 +83,7 @@ const Counter = () => {
         )}
         <div className="mt-6"></div>
       </Card>
-    </div>
+    </>
   );
 };
 export default Counter;

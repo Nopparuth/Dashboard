@@ -4,7 +4,7 @@ const about = () => {
   return (
     <>
       <title>About - Daytech Dashbroad</title>
-      <h2 className="text-xl undefined">About</h2>
+      <h2 className="text-xl undefined ">About</h2>
       <div className="pt-3">
         <div className="p-5 border-1 bg-white rounded-2xl relative undefind">
           <h2 className="text-lg font-bold text-gray-400 mb-1.5">

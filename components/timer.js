@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { IoClose } from "react-icons/io5";
 import Card from "./Card";
 
-const Timer = () => {
+const Timer = ({ item, cardList, onClear = () => {} }) => {
+  console.log(item.id);
   const [time, setTime] = useState({ ms: 0, s: 0, m: 0, h: 0 });
   const [interv, setInterv] = useState();
   const [status, setStatus] = useState(0);
@@ -9,7 +11,7 @@ const Timer = () => {
   const start = () => {
     run();
     setStatus(1);
-    setInterv(setInterval(run, 10));
+    setInterv(setInterval(run, 100));
   };
 
   var updatedMs = time.ms,
@@ -50,32 +52,20 @@ const Timer = () => {
     start();
   };
 
-  // const h = () => {
-  //   if (time.h === 0) {
-  //     return " ";
-  //   } else {
-  //     return <span>{time.h >= 0 ? time.h : "0" + time.h}</span>;
-  //   }
-  // };
-
-  // const m = () => {
-  //   if (time.m === 0) {
-  //     return " ";
-  //   } else {
-  //     return <span>{time.m >= 0 ? time.m : "0" + time.m}</span>;
-  //   }
-  // };
-
   return (
-    <div>
-<Card>{status === 0 ? (
+    <>
+      <Card>
+        {status === 0 ? (
           <>
             <h2 className="text-lg font-bold text-gray-400 mb-1.5">Timer</h2>
+            <div className="absolute top-5 right-5">
+              <button onClick={onClear}>
+                <IoClose />
+              </button>
+            </div>
             <div className="text-center">
               <div className="flex items-center justify-center mt-4 mb-6">
                 <div className="text-6xl mx-7">
-                  {/* {h()}
-                  {m()} */}
                   <span>{time.m >= 10 ? time.m : "0" + time.m}</span>:
                   <span>{time.s >= 10 ? time.s : "0" + time.s}</span>
                 </div>
@@ -102,11 +92,14 @@ const Timer = () => {
         {status === 1 ? (
           <>
             <h2 className="text-lg font-bold text-gray-400 mb-1.5">Timer</h2>
+            <div className="absolute top-5 right-5">
+              <button onClick={onClear}>
+                <IoClose />
+              </button>
+            </div>
             <div className="text-center">
               <div className="flex items-center justify-center mt-4 mb-6">
                 <div className="text-6xl mx-7">
-                  {/* {h()}
-                  {m()} */}
                   <span>{time.m >= 10 ? time.m : "0" + time.m}</span>:
                   <span>{time.s >= 10 ? time.s : "0" + time.s}</span>
                 </div>
@@ -133,11 +126,14 @@ const Timer = () => {
         {status === 2 ? (
           <>
             <h2 className="text-lg font-bold text-gray-400 mb-1.5">Timer</h2>
+            <div className="absolute top-5 right-5">
+              <button onClick={onClear}>
+                <IoClose />
+              </button>
+            </div>
             <div className="text-center">
               <div className="flex items-center justify-center mt-4 mb-6">
                 <div className="text-6xl mx-7">
-                  {/* {h()}
-                  {m()} */}
                   <span>{time.m >= 10 ? time.m : "0" + time.m}</span>:
                   <span>{time.s >= 10 ? time.s : "0" + time.s}</span>
                 </div>
@@ -160,8 +156,8 @@ const Timer = () => {
         ) : (
           " "
         )}
-      </Card>        
-    </div>
+      </Card>
+    </>
   );
 };
 export default Timer;
