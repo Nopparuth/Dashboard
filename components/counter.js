@@ -4,6 +4,7 @@ import Card from "./Card";
 
 const Counter = ({ araigordai, onClear = () => {} }) => {
   const [number, setNumber] = useState(parseInt(araigordai));
+  
   const onIncrease = () => {
     setNumber(number + 1);
     console.log(number);

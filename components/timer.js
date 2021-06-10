@@ -2,16 +2,23 @@ import React, { useState } from "react";
 import { IoClose } from "react-icons/io5";
 import Card from "./Card";
 
-const Timer = ({ item, cardList, onClear = () => {} }) => {
-  console.log(item.id);
+const Timer = ({ item,  onClear = () => {} , totalTimeS, setTotalTimeS, totalTimeM, setTotalTimeM}) => {
+  // console.log(item.id);
   const [time, setTime] = useState({ ms: 0, s: 0, m: 0, h: 0 });
   const [interv, setInterv] = useState();
   const [status, setStatus] = useState(0);
+  const [pTimeS,setPTimeS] = useState(parseInt(0))
+  const [pTimeM,setPTimeM] = useState(parseInt(0))
+
 
   const start = () => {
     run();
     setStatus(1);
-    setInterv(setInterval(run, 100));
+
+    // console.log("time.s", time.s )
+    // console.log("time.m", time.m )
+
+    setInterv(setInterval(run, 10));
   };
 
   var updatedMs = time.ms,
@@ -23,7 +30,7 @@ const Timer = ({ item, cardList, onClear = () => {} }) => {
     if (updatedM === 59) {
       updatedH++;
       updatedM = 0;
-      alert("");
+      // alert("");
     }
     if (updatedS === 59) {
       updatedM++;
@@ -34,13 +41,24 @@ const Timer = ({ item, cardList, onClear = () => {} }) => {
       updatedMs = 0;
     }
     updatedMs++;
+    // setTotalTime(parseInt(totalTime + Number(time.s)))
+      // console.log(totalTime)
     setTime({ ms: updatedMs, s: updatedS, m: updatedM, h: updatedH });
   };
 
   const stop = () => {
     clearInterval(interv);
+    // console.log(time.s)
+    setPTimeS(time.s)
+    setPTimeM(time.m)
+    setTotalTimeS(parseInt((totalTimeS + Number(time.s)) - pTimeS))
+    console.log("pTimeS", pTimeS , "totalTimeS", totalTimeS, "time.s", time.s)
+    setTotalTimeM(parseInt((totalTimeM + Number(time.m)) - pTimeM))
+    console.log("pTimeM", pTimeM , "totalTimeM", totalTimeM, "time.m", time.m)
+    // console.log(totalTime)
     setStatus(2);
   };
+
 
   const reset = () => {
     clearInterval(interv);
@@ -52,8 +70,15 @@ const Timer = ({ item, cardList, onClear = () => {} }) => {
     start();
   };
 
+  const test = () => {
+    console.log("HELLO " , totalTime + time.s)
+    console.log("toTaltime", totalTime)
+
+  }
+
   return (
     <>
+    {/* <button onClick={test}>Timer{totalTime}</button> */}
       <Card>
         {status === 0 ? (
           <>
