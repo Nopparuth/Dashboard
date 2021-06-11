@@ -5,12 +5,15 @@ import WgCounter from "../subwidgets/WgCounter";
 import WgTimer from "../subwidgets/WgTimer";
 import Allcards from "../Allcards";
 import { IoSettingsOutline } from "react-icons/io5";
+import axios from "axios";
+
 
 import { IoClose } from "react-icons/io5";
 
 import { RiAddCircleLine } from "react-icons/ri";
 
 import Card from "../Card";
+import WgWeather from "../subwidgets/WgWeather";
 
 const Widget = () => {
   const [active, setActive] = useState(false);
@@ -19,12 +22,16 @@ const Widget = () => {
   const [activecounter, setActivecounter] = useState(false);
   const [activetimer, setActivetimer] = useState(false);
   const [activeSettings, setActiveSettings] = useState(false);
+  const [activeWeather, setActiveWeather] = useState(false);
 
   const [checkError, setCheckError] = useState("");
   const [txtJustsay, setTxtJustsay] = useState("");
   const [txtCounter, setTxtCounter] = useState(0);
+  const [txtWeather, setTxtWeather] = useState("")
   const [newInput, setNewinput] = useState("");
-  const [zero, setZero] = useState("")
+  const [zero, setZero] = useState("");
+  const [country, setCountry] = useState("");
+
 
   const [totalTimeS, setTotalTimeS] = useState(parseInt(0));
   const [totalTimeM, setTotalTimeM] = useState(parseInt(0));
@@ -37,6 +44,7 @@ const Widget = () => {
       content: "",
       check: "",
       id: "",
+      time: ""
     },
   ]);
 
@@ -49,29 +57,72 @@ const Widget = () => {
     minute: "2-digit",
     second: "2-digit",
   }).format(date);
-  const dateTime = `Added on ${mo} ${da}, ${ye}, ${hms}`;
+  const dateTime = `${mo} ${da}, ${ye}, ${hms}`;
 
   const onCancelText = () => {
     setActivejustsay(false);
     setEditjustsay(false);
     setActivecounter(false);
     setActiveSettings(false);
+    setActiveWeather(false)
   };
 
   const getTotalTime = () => {
-    if(totalTime > 60){
-      setTotalTime(totalTime)
-      console.log(totalTime)
-
+    if (totalTime > 60) {
+      setTotalTime(totalTime);
+      console.log(totalTime);
     }
-    totalTime
-    console.log(totalTime)
+    totalTime;
+    console.log(totalTime);
   };
 
   const onClickJustsay = () => {
     setActive(false);
     setActivejustsay(true);
   };
+
+  const onClickWeather = () => {
+    console.log("WEATHER")
+    setActive(false);
+    setActiveWeather(true);
+  };
+
+  const onAddTxtWeather = async (country) => {
+    console.log("Hello")
+    const idr = Math.floor(Math.random() * 1000) + 1;
+    const filter = {
+      api: "http://api.openweathermap.org/data/2.5/weather",
+      q: country,
+      appid: "3538704e75db70141f355f244c267e11",
+      units: "metric",
+    };
+    try {
+      const result = await axios.get(
+        `${filter.api}?q=${filter.q}&appid=${filter.appid}&units=${filter.units}`
+      );
+      console.log(filter.api, filter.q, filter.appid, filter.units, result);
+      const newData = [
+        ...cardList,
+        { content: result.data, check: "Weather", id: idr, time: dateTime  },
+      ];
+      console.log("newData", newData)
+      // const newData = [...cardList, result.data];
+      // console.log(newDatas)
+      setCardList(newData);
+    } catch (error) {
+      console.log(error.response);
+      // Swal.fire({
+      //   title: "Error",
+      //   text: "City not found!",
+      //   icon: "error",
+      //   confirmButtonText: "ok",
+      // });
+    }
+    setActiveWeather(false)
+    setCountry("");
+    
+  }
+
 
   const onClickEditJustsay = (item) => {
     setNewinput(item);
@@ -108,7 +159,7 @@ const Widget = () => {
     } else {
       const newData = [
         ...cardList,
-        { content: txtJustsay, check: "JustSay", id: idr },
+        { content: txtJustsay, check: "JustSay", id: idr, time: dateTime },
       ];
       setCardList(newData);
       console.log("cardList", newData.id);
@@ -142,8 +193,6 @@ const Widget = () => {
     setActivecounter(true);
   };
 
-  
-
   const onAddTxtCounter = (e) => {
     const idr = Math.floor(Math.random() * 1000) + 1;
     console.log("length", e);
@@ -152,7 +201,7 @@ const Widget = () => {
     } else if (e.length === 0) {
       setCheckError("Please provide some value.");
     } else {
-      const newData = [...cardList, { content: e, check: "Counter", id: idr }];
+      const newData = [...cardList, { content: e, check: "Counter", id: idr, time: dateTime }];
       setCardList(newData);
       setCounterlength(counterLength + Number(e));
       setActivecounter(false);
@@ -163,7 +212,7 @@ const Widget = () => {
 
   const onClickTimer = () => {
     const idr = Math.floor(Math.random() * 1000) + 1;
-    const newData = [...cardList, { content: "", check: "Timer", id: idr }];
+    const newData = [...cardList, { content: "", check: "Timer", id: idr, time: dateTime }];
     console.log(newData);
     setCardList(newData);
     setActive(false);
@@ -186,17 +235,17 @@ const Widget = () => {
   };
 
   const onSetZero = (e) => {
-    // e.preventDefault();
-    setCardList([])
+    e.preventDefault();
+    // setCardList([])
     // setZero(e.target.value)
     // console.log("type", e.target.onselect);
-    // cardList.map((card) => {
-    //   if (card.check === "Counter") {
-    //     card.content = "0";
-    //     return card;
-    //   }
-    // });
-    // setActiveSettings(false);
+    cardList.map((card) => {
+      if (card.check === "Counter") {
+        card.content = "0";
+        setNumber(0);
+      }
+    });
+    setActiveSettings(false);
   };
 
   const onClose = () => {
@@ -362,6 +411,40 @@ const Widget = () => {
           </div>
         )}
 
+{activeWeather && (
+          <Modal>
+            <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+              <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+                <button onClick={() => onCancelText} className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none">
+                <IoClose />
+                </button>
+                <div>
+                  <fieldset>
+                    <h2 className="text-xl mb-2">Add Weather</h2>
+                    <form className="flex">
+                      <div className="flex-1 mr-1">
+                        <input
+                          type="text"
+                          className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                          placeholder="Enter a city"
+                          value={txtWeather}
+                          onChange={(event) => setTxtWeather(event.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <button onClick={() => onAddTxtWeather(txtWeather)}  className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600">
+                          {" "}
+                          Add
+                        </button>
+                      </div>
+                    </form>
+                  </fieldset>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        )}
+
         <Allcards
           cardList={cardList}
           onClear={onClear}
@@ -381,9 +464,12 @@ const Widget = () => {
               <WgJustsay onClickJustsay={onClickJustsay} />
               <WgCounter onClickCounter={onClickCounter} />
               <WgTimer onClickTimer={onClickTimer} />
+              <WgWeather onClickWeather={onClickWeather}/>
             </div>
           </Modal>
         )}
+
+       
 
         {activeSettings && (
           <Modal>
@@ -424,7 +510,10 @@ const Widget = () => {
                         <div className="table-cell pr-4 font-semibold">
                           Total time:{" "}
                         </div>
-                        <div className="table-cell">{totalTimeM >= 10 ? totalTimeM : "0" + totalTimeM}:{totalTimeS >= 10 ? totalTimeS : "0" + totalTimeS}</div>
+                        <div className="table-cell">
+                          {totalTimeM >= 10 ? totalTimeM : "0" + totalTimeM}:
+                          {totalTimeS >= 10 ? totalTimeS : "0" + totalTimeS}
+                        </div>
                       </div>
                       <div className="table-row">
                         <div className="table-cell pr-4 font-semibold">
@@ -465,7 +554,10 @@ const Widget = () => {
                       Reset Zone
                     </h2>
                     <div className="flex items-center">
-                      <select name="select" className="flex-1 mt-1 mr-1.5 py-1.5 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 text-sm">
+                      <select
+                        name="select"
+                        className="flex-1 mt-1 mr-1.5 py-1.5 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 text-sm"
+                      >
                         <option value="Counter">All counters</option>
                         <option value="Timer">All timers</option>
                       </select>
