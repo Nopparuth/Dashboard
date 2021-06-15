@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "../modal";
 import WgJustsay from "../subwidgets/WgJustsay";
 import WgCounter from "../subwidgets/WgCounter";
@@ -6,19 +6,25 @@ import WgTimer from "../subwidgets/WgTimer";
 import Allcards from "../Allcards";
 import { IoSettingsOutline } from "react-icons/io5";
 import axios from "axios";
-
-
+import Button from "../Buttons";
 import { IoClose } from "react-icons/io5";
 
 import { RiAddCircleLine } from "react-icons/ri";
 
 import Card from "../Card";
 import WgWeather from "../subwidgets/WgWeather";
+import WgJustshout from "../subwidgets/WgJustshout";
+import WgCovid from "../subwidgets/WgCovid";
 
 const Widget = () => {
+  const disabled = false;
   const [active, setActive] = useState(false);
   const [activejustsay, setActivejustsay] = useState(false);
   const [editjustsay, setEditjustsay] = useState(false);
+  const [editjustshout, setEditjustshout] = useState(false);
+  const [activeCovid, setActiveCovid] = useState(false);
+
+  const [activeJustshout, setActivejustshout] = useState(false);
   const [activecounter, setActivecounter] = useState(false);
   const [activetimer, setActivetimer] = useState(false);
   const [activeSettings, setActiveSettings] = useState(false);
@@ -27,11 +33,19 @@ const Widget = () => {
   const [checkError, setCheckError] = useState("");
   const [txtJustsay, setTxtJustsay] = useState("");
   const [txtCounter, setTxtCounter] = useState(0);
-  const [txtWeather, setTxtWeather] = useState("")
+  const [txtWeather, setTxtWeather] = useState("");
+  const [txtJustshout, setTxtJustshout] = useState("");
+  const [newInputOpenWeather, setNewInputOpenWeather] = useState("");
+  const [totalJustshout, setTotalJustshout] = useState(0);
+  const [justShoutLength, setJustShoutLength] = useState(0);
+  const [totalJust, setTotalJust] = useState(0);
+  const [cardCount, setCardCount] = useState(0);
+  const [txtCovid, setTxtCovid] = useState("");
   const [newInput, setNewinput] = useState("");
   const [zero, setZero] = useState("");
   const [country, setCountry] = useState("");
-
+  const [city, setCity] = useState("N/A");
+  const [editWeather, setEditWeather] = useState("");
 
   const [totalTimeS, setTotalTimeS] = useState(parseInt(0));
   const [totalTimeM, setTotalTimeM] = useState(parseInt(0));
@@ -44,7 +58,7 @@ const Widget = () => {
       content: "",
       check: "",
       id: "",
-      time: ""
+      time: "",
     },
   ]);
 
@@ -59,21 +73,71 @@ const Widget = () => {
   }).format(date);
   const dateTime = `${mo} ${da}, ${ye}, ${hms}`;
 
+  useEffect(() => {
+    getLocal();
+  }, []);
+
+  useEffect(() => {
+    saveLocal();
+  }, [cardList]);
+
+  const saveLocal = () => {
+    localStorage.setItem("cardList", JSON.stringify(cardList)); 
+    localStorage.setItem("allwidget", JSON.stringify(allwidget));
+    localStorage.setItem("txtLength", JSON.stringify(txtLength))
+    localStorage.setItem("cardCount", JSON.stringify(cardCount))
+    localStorage.setItem("justShoutLength", JSON.stringify(justShoutLength))
+    localStorage.setItem("totalTimeM", JSON.stringify(totalTimeM))
+    localStorage.setItem("totalTimeS", JSON.stringify(totalTimeS))
+  };
+
+  const getLocal = () => {
+    if (
+      localStorage.getItem("cardList") === null ||
+      localStorage.getItem("allwidget") === null ||
+      localStorage.getItem("txtLength") === null ||
+      localStorage.getItem("totalTimeM") === null ||
+      localStorage.getItem("totalTimeS") === null ||
+      localStorage.getItem("cardCount") === null ||
+      localStorage.getItem("justShoutLength") === null
+
+    ) {
+      localStorage.getItem("cardList", JSON.stringify([]));
+      localStorage.getItem("allwidget", JSON.stringify([]))
+      localStorage.getItem("txtLength", JSON.stringify([]))
+      localStorage.setItem("cardCount", JSON.stringify([]))
+    localStorage.setItem("justShoutLength", JSON.stringify([]))
+    localStorage.getItem("totalTimeM", JSON.stringify([]))
+    localStorage.getItem("totalTimeS", JSON.stringify([]))
+    } else {
+      let Local = JSON.parse(localStorage.getItem("cardList"));
+      let Localallwidget = JSON.parse(localStorage.getItem("allwidget"))
+      let Localtxtlength = JSON.parse(localStorage.getItem("txtLength"));
+      let LocalCardCount = JSON.parse(localStorage.getItem("cardCount"))
+      let LocalJustShoutLength = JSON.parse(localStorage.getItem("justShoutLength"))
+      let LocaltotalTimeM = JSON.parse(localStorage.getItem("totalTimeM"));
+      let LocaltotalTimeS = JSON.parse(localStorage.getItem("totalTimeS"))
+      setAllwidget(Localallwidget)
+      setCardList(Local);
+      setTxtlength(Localtxtlength)
+      setCardCount(LocalCardCount)
+      setJustShoutLength(LocalJustShoutLength)
+      setTotalTimeM(LocaltotalTimeM)
+      setTotalTimeS(LocaltotalTimeS)
+    
+    }
+  };
+
   const onCancelText = () => {
     setActivejustsay(false);
     setEditjustsay(false);
+    setEditjustshout(false);
     setActivecounter(false);
     setActiveSettings(false);
-    setActiveWeather(false)
-  };
-
-  const getTotalTime = () => {
-    if (totalTime > 60) {
-      setTotalTime(totalTime);
-      console.log(totalTime);
-    }
-    totalTime;
-    console.log(totalTime);
+    setActiveWeather(false);
+    setActivejustshout(false);
+    setActiveCovid(false);
+    setEditWeather(false);
   };
 
   const onClickJustsay = () => {
@@ -81,14 +145,23 @@ const Widget = () => {
     setActivejustsay(true);
   };
 
+  const onClickJustshout = () => {
+    setActive(false);
+    setActivejustshout(true);
+  };
+
+  const onClickCovid = () => {
+    setActive(false);
+    setActiveCovid(true);
+  };
+
   const onClickWeather = () => {
-    console.log("WEATHER")
+    console.log("WEATHER");
     setActive(false);
     setActiveWeather(true);
   };
 
   const onAddTxtWeather = async (country) => {
-    console.log("Hello")
     const idr = Math.floor(Math.random() * 1000) + 1;
     const filter = {
       api: "http://api.openweathermap.org/data/2.5/weather",
@@ -103,12 +176,86 @@ const Widget = () => {
       console.log(filter.api, filter.q, filter.appid, filter.units, result);
       const newData = [
         ...cardList,
-        { content: result.data, check: "Weather", id: idr, time: dateTime  },
+        { content: result.data, check: "Weather", id: idr, time: dateTime },
       ];
-      console.log("newData", newData)
+      console.log("newData", newData);
+      setAllwidget(allwidget + 1);
+
+      setCardList(newData);
+    } catch (error) {
+      console.log(error.response);
+      alert("city not found")
+    }
+    console.log(country)
+    setCountry("");
+
+    setActiveWeather(false);
+  };
+
+  const onClickEditWeather = (item) => {
+    setEditWeather(true);
+    setNewInputOpenWeather(item);
+  };
+
+  const onEditWeather = async (input) => {
+    const idr = Math.floor(Math.random() * 1000) + 1;
+    const filter = {
+      api: "http://api.openweathermap.org/data/2.5/weather",
+      q: input,
+      appid: "3538704e75db70141f355f244c267e11",
+      units: "metric",
+    };
+    try {
+      const result = await axios.get(
+        `${filter.api}?q=${filter.q}&appid=${filter.appid}&units=${filter.units}`
+      );
+      console.log(filter.api, filter.q, filter.appid, filter.units, result);
+      setCardList(
+        cardList.map((card) => {
+          if (card.id === newInputOpenWeather.id) {
+            card.content = result.data;
+            card.time = dateTime;
+            return card;
+          } else {
+            return card;
+          }
+        })
+      );
+    } catch (error) {
+      console.log(error.response);
+    }
+    setEditWeather(false);
+    setCountry("");
+  };
+
+  const onClickRefresh = async (item) => {
+    // console.log("Hello");
+    const idr = Math.floor(Math.random() * 1000) + 1;
+    const filter = {
+      api: "http://api.openweathermap.org/data/2.5/weather",
+      q: item.content.name,
+      appid: "3538704e75db70141f355f244c267e11",
+      units: "metric",
+    };
+    try {
+      const result = await axios.get(
+        `${filter.api}?q=${filter.q}&appid=${filter.appid}&units=${filter.units}`
+      );
+      console.log(filter.api, filter.q, filter.appid, filter.units, result);
+      setCardList(
+        cardList.map((card) => {
+          if (card.id === item.id) {
+            card.content = result.data;
+            card.time = dateTime;
+            return card;
+          } else {
+            return card;
+          }
+        })
+      );
+
       // const newData = [...cardList, result.data];
       // console.log(newDatas)
-      setCardList(newData);
     } catch (error) {
       console.log(error.response);
       // Swal.fire({
@@ -118,11 +265,45 @@ const Widget = () => {
       //   confirmButtonText: "ok",
       // });
     }
-    setActiveWeather(false)
+    setAllwidget(allwidget + 1);
+    setActiveWeather(false);
     setCountry("");
-    
-  }
+  };
 
+  const onAddTxtCovid = (e) => {
+    console.log("test");
+    const idr = Math.floor(Math.random() * 1000) + 1;
+    const options = {
+      method: "GET",
+      url: "https://covid-19-data.p.rapidapi.com/country",
+      params: { name: txtCovid },
+      headers: {
+        "x-rapidapi-key": "f66eed8fcdmsh9edd7e06505187ap164388jsn3d606ebb33a8",
+        "x-rapidapi-host": "covid-19-data.p.rapidapi.com",
+      },
+    };
+    try {
+      axios
+        .request(options)
+        .then(function (response) {
+          const newData = [
+            ...cardList,
+            { content: response.data, check: "Covid", id: idr, time: dateTime },
+          ];
+          setCardList(newData);
+          setAllwidget(allwidget + 1);
+          
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+    } catch (error) {
+      console.log(error.response);
+    }
+
+    setActiveCovid(false);
+    setTxtCovid("");
+  };
 
   const onClickEditJustsay = (item) => {
     setNewinput(item);
@@ -135,8 +316,25 @@ const Widget = () => {
     setEditjustsay(true);
   };
 
+  const onClickEditJustshout = (item) => {
+    console.log("EDIT");
+    setNewinput(item);
+    cardList.map((card) => {
+      if (item.check === "JustShout") {
+        setTxtJustshout(item.content);
+      }
+    });
+    setEditjustshout(true);
+  };
+
   const onClear = (item) => {
+    if (item.check === "JustSay" || item.check === "JustShout") {
+      setCardCount(cardCount - 1);
+    }else if(item.check === "Timer"){
+      
+    }
     setCardList(cardList.filter((_item) => _item.id !== item.id));
+    setAllwidget(allwidget - 1);
   };
 
   const onClearAll = (item) => {
@@ -145,11 +343,21 @@ const Widget = () => {
     });
     setAllwidget(0);
     setTxtlength(0);
+    setCardCount(0);
+    setCity("N/A");
     setActiveSettings(false);
   };
 
   const onInputJustSay = (e) => {
     setTxtJustsay(e.target.value);
+  };
+
+  const onInputJustShout = (e) => {
+    setTxtJustshout(e.target.value);
+  };
+
+  const onInputCovid = (e) => {
+    setTxtCovid(e.target.value);
   };
 
   const onAddTxtJustSay = (e) => {
@@ -170,6 +378,30 @@ const Widget = () => {
     }
   };
 
+  const onAddTxtJustShout = (e) => {
+    const idr = Math.floor(Math.random() * 1000) + 1;
+    if (txtJustshout.length < 3) {
+      setCheckError("Please enter at least 3 characters.");
+    } else {
+      const newData = [
+        ...cardList,
+        { content: txtJustshout, check: "JustShout", id: idr, time: dateTime },
+      ];
+      cardList.map((card) => {
+        if (card.check === "JustShout") {
+          card.content = txtJustshout;
+          return card;
+        }
+      });
+      setCardList(newData);
+      console.log("cardList", newData.id);
+      setActivejustshout(false);
+      setAllwidget(allwidget + 1);
+      setJustShoutLength(txtJustshout.length);
+      setCardCount(cardCount + 1);
+    }
+  };
+
   const onEditTxtJustSay = (e) => {
     if (txtJustsay.length < 3) {
       setCheckError("Please enter at least 3 characters.");
@@ -177,7 +409,11 @@ const Widget = () => {
       setCardList(
         cardList.map((card) => {
           if (card.id === newInput.id) {
+            const num = txtJustsay.length + (txtLength - card.content.length);
+            setTxtlength(num);
+
             newInput.content = txtJustsay;
+
             return newInput;
           } else {
             return card;
@@ -185,7 +421,26 @@ const Widget = () => {
         })
       );
     }
+    // setTxtlength(txtJustsay.length)
     setEditjustsay(false);
+  };
+
+  const onEditTxtJustShout = (e) => {
+    console.log("e", e.target.value);
+    if (txtJustshout.length < 3) {
+      setCheckError("Please enter at least 3 characters.");
+    } else {
+      setCardList(
+        cardList.map((card) => {
+          card.content = txtJustshout;
+          return card;
+        })
+      );
+    }
+    setActiveSettings(false);
+    setJustShoutLength(txtJustshout.length);
+    // setTxtlength(txtLength - txtJustshout.length )
+    setEditjustshout(false);
   };
 
   const onClickCounter = () => {
@@ -201,7 +456,10 @@ const Widget = () => {
     } else if (e.length === 0) {
       setCheckError("Please provide some value.");
     } else {
-      const newData = [...cardList, { content: e, check: "Counter", id: idr, time: dateTime }];
+      const newData = [
+        ...cardList,
+        { content: e, check: "Counter", id: idr, time: dateTime },
+      ];
       setCardList(newData);
       setCounterlength(counterLength + Number(e));
       setActivecounter(false);
@@ -212,7 +470,10 @@ const Widget = () => {
 
   const onClickTimer = () => {
     const idr = Math.floor(Math.random() * 1000) + 1;
-    const newData = [...cardList, { content: "", check: "Timer", id: idr, time: dateTime }];
+    const newData = [
+      ...cardList,
+      { content: "", check: "Timer", id: idr, time: dateTime },
+    ];
     console.log(newData);
     setCardList(newData);
     setActive(false);
@@ -226,19 +487,23 @@ const Widget = () => {
   };
 
   const onClickSetting = () => {
-    console.log("clicked Setting");
-    console.log("Allwidget", allwidget);
-    console.log("Total Txt", txtLength);
-    console.log("Total Counter", counterLength);
-    // console.log("TotalTimer", totalTime);
+    setTotalJustshout(cardCount * justShoutLength);
+    var a = 100;
+    cardList.map((card) => {
+      if (card.check === "Weather") {
+        try {
+          if (card.content.main.temp < a) {
+            a = card.content.main.temp;
+            setCity(card.content.name);
+          }
+        } catch {}
+      }
+    });
     setActiveSettings(true);
   };
 
   const onSetZero = (e) => {
     e.preventDefault();
-    // setCardList([])
-    // setZero(e.target.value)
-    // console.log("type", e.target.onselect);
     cardList.map((card) => {
       if (card.check === "Counter") {
         card.content = "0";
@@ -372,6 +637,46 @@ const Widget = () => {
           </div>
         )}
 
+        {editjustshout && (
+          <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+            <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+              <button
+                onClick={onCancelText}
+                className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none"
+              >
+                <IoClose />
+              </button>
+              <div>
+                <fieldset>
+                  <h2 className="text-xl mb-2">Edit JustShout</h2>
+                  <form className="flex" onSubmit={onEditTxtJustShout}>
+                    <div className="flex-1 mr-1">
+                      <input
+                        type="text"
+                        className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                        placeholder="Enter text"
+                        defaultValue={txtJustshout}
+                        onChange={onInputJustShout}
+                        required
+                      ></input>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+                      >
+                        {" "}
+                        Edit
+                      </button>
+                    </div>
+                  </form>
+                  <p className="text-red-600 text-xs mt-1">{checkError}</p>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activecounter && (
           <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
             <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
@@ -411,38 +716,159 @@ const Widget = () => {
           </div>
         )}
 
-{activeWeather && (
-          <Modal>
-            <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
-              <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
-                <button onClick={() => onCancelText} className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none">
+        {activeWeather && (
+          <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+            <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+              <button
+                onClick={onCancelText}
+                className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none"
+              >
                 <IoClose />
-                </button>
-                <div>
-                  <fieldset>
-                    <h2 className="text-xl mb-2">Add Weather</h2>
-                    <form className="flex">
-                      <div className="flex-1 mr-1">
-                        <input
-                          type="text"
-                          className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
-                          placeholder="Enter a city"
-                          value={txtWeather}
-                          onChange={(event) => setTxtWeather(event.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <button onClick={() => onAddTxtWeather(txtWeather)}  className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600">
-                          {" "}
-                          Add
-                        </button>
-                      </div>
-                    </form>
-                  </fieldset>
-                </div>
+              </button>
+              <div>
+                <fieldset>
+                  <h2 className="text-xl mb-2">Add Weather</h2>
+                  <form className="flex">
+                    <div className="flex-1 mr-1">
+                      <input
+                        type="text"
+                        className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                        placeholder="Enter a city"
+                        value={txtWeather}
+                        onChange={(event) => setTxtWeather(event.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => onAddTxtWeather(txtWeather)}
+                        className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+                      >
+                        {" "}
+                        Add
+                      </button>
+                    </div>
+                  </form>
+                </fieldset>
               </div>
             </div>
-          </Modal>
+          </div>
+        )}
+        {editWeather && (
+          <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+            <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+              <button
+                onClick={onCancelText}
+                className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none"
+              >
+                <IoClose />
+              </button>
+              <div>
+                <fieldset>
+                  <h2 className="text-xl mb-2">Edit Weather</h2>
+                  <form className="flex">
+                    <div className="flex-1 mr-1">
+                      <input
+                        type="text"
+                        className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                        placeholder="Enter a city"
+                        value={txtWeather}
+                        onChange={(event) => setTxtWeather(event.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => onEditWeather(txtWeather)}
+                        className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+                      >
+                        {" "}
+                        Edit
+                      </button>
+                    </div>
+                  </form>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeJustshout && (
+          <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+            <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+              <button
+                onClick={onCancelText}
+                className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none"
+              >
+                <IoClose />
+              </button>
+              <div>
+                <fieldset>
+                  <h2 className="text-xl mb-2">Add JustShout</h2>
+                  <form className="flex" onSubmit={onAddTxtJustShout}>
+                    <div className="flex-1 mr-1">
+                      <input
+                        type="text"
+                        className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                        placeholder="Enter text"
+                        value={txtJustshout}
+                        onChange={onInputJustShout}
+                        required
+                      ></input>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+                      >
+                        {" "}
+                        Add
+                      </button>
+                    </div>
+                  </form>
+                  <p className="text-red-600 text-xs mt-1">{checkError}</p>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeCovid && (
+          <div className="fixed flex items-center py-5 justify-center top-0 right-0 bottom-0 left-0 bg-black bg-opacity-70 z-50">
+            <div className="relative bg-gray-200 m-5 p-6 pt-4 md:p-8 md:pt-6 rounded-2xl w-96 max-w-full max-h-full overflow-auto">
+              <button
+                onClick={onCancelText}
+                className="absolute text-lg text-gray-600 top-4 right-4 focus:outline-none"
+              >
+                <IoClose />
+              </button>
+              <div>
+                <fieldset>
+                  <h2 className="text-xl mb-2">Add Covid</h2>
+                  <form className="flex" onSubmit={onAddTxtCovid}>
+                    <div className="flex-1 mr-1">
+                      <input
+                        type="text"
+                        className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                        placeholder="Enter a country"
+                        value={txtCovid}
+                        onChange={onInputCovid}
+                        required
+                      ></input>
+                    </div>
+                    <div>
+                      <button
+                        type="submit"
+                        className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-500 hover:bg-blue-600"
+                      >
+                        {" "}
+                        Add
+                      </button>
+                    </div>
+                  </form>
+                  <p className="text-red-600 text-xs mt-1">{checkError}</p>
+                </fieldset>
+              </div>
+            </div>
+          </div>
         )}
 
         <Allcards
@@ -450,10 +876,13 @@ const Widget = () => {
           onClear={onClear}
           setCardList={setCardList}
           onClickEditJustsay={onClickEditJustsay}
+          onClickEditJustshout={onClickEditJustshout}
           totalTimeS={totalTimeS}
           setTotalTimeS={setTotalTimeS}
           totalTimeM={totalTimeM}
           setTotalTimeM={setTotalTimeM}
+          onClickRefresh={onClickRefresh}
+          onClickEditWeather={onClickEditWeather}
           // onEditTxtJustSay={onEditTxtJustSay}
         />
 
@@ -464,12 +893,12 @@ const Widget = () => {
               <WgJustsay onClickJustsay={onClickJustsay} />
               <WgCounter onClickCounter={onClickCounter} />
               <WgTimer onClickTimer={onClickTimer} />
-              <WgWeather onClickWeather={onClickWeather}/>
+              <WgWeather onClickWeather={onClickWeather} />
+              <WgJustshout onClickJustshout={onClickJustshout} />
+              <WgCovid onClickCovid={onClickCovid} />
             </div>
           </Modal>
         )}
-
-       
 
         {activeSettings && (
           <Modal>
@@ -498,7 +927,9 @@ const Widget = () => {
                         <div className="table-cell pr-4 font-semibold">
                           Total Just length:{" "}
                         </div>
-                        <div className="table-cell">{txtLength}</div>
+                        <div className="table-cell">
+                          {txtLength + totalJustshout}
+                        </div>
                       </div>
                       <div className="table-row">
                         <div className="table-cell pr-4 font-semibold">
@@ -519,36 +950,68 @@ const Widget = () => {
                         <div className="table-cell pr-4 font-semibold">
                           Coldest cities:{" "}
                         </div>
-                        <div className="table-cell">N/A</div>
+                        <div className="table-cell">{city}</div>
                       </div>
                     </div>
                   </div>
-                  <div className="p-5 border-1 bg-white rounded-2xl relative mb-4">
-                    <h2 className="text-lg font-bold text-gray-400 mb-1.5">
-                      JustShout text
-                    </h2>
-                    <fieldset disabled>
-                      <form className="flex">
-                        <div className="flex-1 mr-1">
-                          <input
-                            type="text"
-                            className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
-                            placeholder="Enter text"
-                            defaultValue
-                          />
-                        </div>
-                        <div>
-                          <button
-                            className="text-white focus:outline-none px-4 py-1 rounded-md bg-gray-300 cursor-default"
-                            disabled
-                          >
-                            {" "}
-                            Edit
-                          </button>
-                        </div>
-                      </form>
-                    </fieldset>
-                  </div>
+                  {txtJustshout.length === 0 ? (
+                    <div className="p-5 border-1 bg-white rounded-2xl relative mb-4">
+                      <h2 className="text-lg font-bold text-gray-400 mb-1.5">
+                        JustShout text
+                      </h2>
+                      <fieldset disabled>
+                        <form className="flex">
+                          <div className="flex-1 mr-1">
+                            <input
+                              type="text"
+                              className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                              placeholder="Enter text"
+                              onChange={onInputJustShout}
+                              defaultValue={txtJustshout}
+                            />
+                          </div>
+                          <div>
+                            <button
+                              onClick={onEditTxtJustShout}
+                              className="text-white focus:outline-none px-4 py-1 rounded-md bg-gray-300 cursor-default"
+                            >
+                              {" "}
+                              Edit
+                            </button>
+                          </div>
+                        </form>
+                      </fieldset>
+                    </div>
+                  ) : (
+                    <div className="p-5 border-1 bg-white rounded-2xl relative mb-4">
+                      <h2 className="text-lg font-bold text-gray-400 mb-1.5">
+                        JustShout text
+                      </h2>
+                      <fieldset>
+                        <form className="flex">
+                          <div className="flex-1 mr-1">
+                            <input
+                              type="text"
+                              className="w-full px-2.5 py-1 border focus:outline-none rounded-md"
+                              placeholder="Enter text"
+                              onChange={onInputJustShout}
+                              defaultValue={txtJustshout}
+                            />
+                          </div>
+                          <div>
+                            <button
+                              onClick={onEditTxtJustShout}
+                              className="text-white focus:outline-none px-4 py-1 rounded-md bg-blue-600 cursor-default"
+                            >
+                              {" "}
+                              Edit
+                            </button>
+                          </div>
+                        </form>
+                      </fieldset>
+                    </div>
+                  )}
+
                   <div className="p-5 border-1 bg-white rounded-2xl relative mb-4">
                     <h2 className="text-lg font-bold text-gray-400 mb-1.5">
                       Reset Zone

@@ -2,20 +2,26 @@ import React from "react";
 import Card from "../components/Card";
 import { IoClose } from "react-icons/io5";
 import { TiRefresh } from "react-icons/ti";
+import { MdEdit } from "react-icons/md";
 
-const Weather = ({ araigordai}) => {
+
+const Weather = ({ araigordai, onClear = () => {}, onClickRefresh = () => {}, onClickEditWeather= () => {}}) => {
+  
   return (
     <>
       <Card>
         <div>
           <h2 className="text-lg font-bold text-gray-400 mb-1.5">Weather</h2>
           <div className="absolute top-5 right-5">
-            <button className="text-lg text-gray-600 focus:outline-none mr-2">
+          <button onClick={onClickEditWeather} className="text-lg text-gray-600 focus:outline-none mr-2">
+            <MdEdit/>
+          </button>
+            <button onClick={onClickRefresh} className="text-lg text-gray-600 focus:outline-none mr-2">
               <TiRefresh />
             </button>
             <button className="text-lg text-gray-600 focus:outline-none mr-2">
             </button>
-            <button className="text-lg text-gray-600 focus:outline-none undefined">
+            <button onClick={onClear} className="text-lg text-gray-600 focus:outline-none undefined">
               <IoClose/>
             </button>
           </div>

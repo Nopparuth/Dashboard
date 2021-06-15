@@ -18,7 +18,7 @@ const Timer = ({ item,  onClear = () => {} , totalTimeS, setTotalTimeS, totalTim
     // console.log("time.s", time.s )
     // console.log("time.m", time.m )
 
-    setInterv(setInterval(run, 10));
+    setInterv(setInterval(run, 100));
   };
 
   var updatedMs = time.ms,
